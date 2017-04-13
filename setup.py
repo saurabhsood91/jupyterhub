@@ -13,6 +13,7 @@ from __future__ import print_function
 import os
 import shutil
 import sys
+import json
 
 v = sys.version_info
 if v[:2] < (3,3):
@@ -250,41 +251,29 @@ class CSS(BaseCommand):
         self.distribution.data_files = get_data_files()
 
 
-class SiteCustomizations(BaseCommand):
+class Brand(BaseCommand):
     description = "Site level customizations"
-    user_options = [
-        ('css=', None, 'Specify the path to the custom css file'),
-        ('logo=', None, 'Specify the logo to use'),
-    ]
-
-    def initialize_options(self):
-        self.css = None
-        self.logo = None
-
-    def should_run(self):
-        if self.css or self.logo:
-            return True
-        return False
 
     def run(self):
-        if not self.should_run():
-            print('No Custom CSS or logo')
-            return
 
-        if self.css:
-            if os.path.exists(self.css):
-                css_path = pjoin(static, 'css', 'custom.css')
-                shutil.copyfile(self.css, css_path)
-                print('Copied Custom CSS File')
-            else:
-                print('Custom CSS file does not exist')
+        # read config file
+        with open("config") as config_file:
+            config = json.loads(config_file.read())
 
-        if self.logo:
-            if os.path.exists(self.logo):
-                logo_path = pjoin(static, 'images', 'logo.png')
-                shutil.copyfile(self.logo, logo_path)
-            else:
-                print('Logo does not exist')
+            if config['custom_css']:
+                if os.path.exists(config['custom_css']):
+                    css_path = pjoin(static, 'less', 'custom.less')
+                    shutil.copyfile(config['custom_css'], css_path)
+                    print('Copied Custom Less file')
+                else:
+                    print('Custom Less file does not exist')
+
+            if config['logo']:
+                if os.path.exists(config['logo']):
+                    logo_path = pjoin(static, 'images', 'jupyter.png')
+                    shutil.copyfile(config['logo'], logo_path)
+                else:
+                    print('Logo does not exist')
 
 
 def js_css_first(cls, strict=True):
@@ -313,7 +302,7 @@ class bdist_egg_disabled(bdist_egg):
 
 
 setup_args['cmdclass'] = {
-    'custom': SiteCustomizations,
+    'brand': Brand,
     'js': Bower,
     'css': CSS,
     'build_py': js_css_first(build_py, strict=is_repo),
@@ -329,7 +318,7 @@ from setuptools.command.develop import develop
 class develop_js_css(develop):
     def run(self):
         if not self.uninstall:
-            self.distribution.run_command('custom')
+            self.distribution.run_command('brand')
             self.distribution.run_command('js')
             self.distribution.run_command('css')
         develop.run(self)
