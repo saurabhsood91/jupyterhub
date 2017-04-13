@@ -262,7 +262,7 @@ class Brand(BaseCommand):
 
             if config.get('custom_css'):
                 if os.path.exists(config['custom_css']):
-                    css_path = pjoin(static, 'less', 'custom.less')
+                    css_path = pjoin(static, 'less', 'brand.less')
                     shutil.copyfile(config['custom_css'], css_path)
                     print('Copied Custom Less file')
                 else:
@@ -275,13 +275,11 @@ class Brand(BaseCommand):
                 else:
                     print('Logo does not exist')
 
-            warning_path = pjoin(share_jupyter, 'templates', 'warning.html')
-            warning = "Warning: Sandstone seems to be served over an unsecured HTTP connection. We strongly recommend enabling HTTPS for Sandstone."
-            with open(warning_path, 'w+') as warning_file:
-                if config.get('warning'):
-                    warning = config['warning']
-                warning_text = "<p id='insecure-login-warning' class='hidden'>{}</p>".format(warning)
-                warning_file.write(warning_text)
+            title = config.get('title', 'JupyterHub')
+            title_path = pjoin(share_jupyter, 'templates', 'title.html')
+            with open(title_path, 'w+') as title_file:
+                title_text = "{{% block title %}}{}{{% endblock %}}".format(title)
+                title_file.write(title_text)
 
 
 def js_css_first(cls, strict=True):
