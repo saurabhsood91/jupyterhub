@@ -1,4 +1,5 @@
 {
     "custom_css": "/home/saurabh/workspace/jupyterhub/custom.less",
-    "logo": "/home/saurabh/workspace/jupyterhub/sandstone.png"
+    "logo": "/home/saurabh/workspace/jupyterhub/sandstone.png",
+    "warning_text": "Warning: Sandstone seems to be served over an unsecured HTTP connection. We strongly recommend enabling HTTPS for Sandstone."
 }

@@ -260,7 +260,7 @@ class Brand(BaseCommand):
         with open("config") as config_file:
             config = json.loads(config_file.read())
 
-            if config['custom_css']:
+            if config.get('custom_css'):
                 if os.path.exists(config['custom_css']):
                     css_path = pjoin(static, 'less', 'custom.less')
                     shutil.copyfile(config['custom_css'], css_path)
@@ -268,12 +268,20 @@ class Brand(BaseCommand):
                 else:
                     print('Custom Less file does not exist')
 
-            if config['logo']:
+            if config.get('logo'):
                 if os.path.exists(config['logo']):
                     logo_path = pjoin(static, 'images', 'jupyter.png')
                     shutil.copyfile(config['logo'], logo_path)
                 else:
                     print('Logo does not exist')
+
+            warning_path = pjoin(share_jupyter, 'templates', 'warning.html')
+            warning = "Warning: Sandstone seems to be served over an unsecured HTTP connection. We strongly recommend enabling HTTPS for Sandstone."
+            with open(warning_path, 'w+') as warning_file:
+                if config.get('warning'):
+                    warning = config['warning']
+                warning_text = "<p id='insecure-login-warning' class='hidden'>{}</p>".format(warning)
+                warning_file.write(warning_text)
 
 
 def js_css_first(cls, strict=True):
